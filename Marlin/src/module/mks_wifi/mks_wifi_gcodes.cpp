@@ -1,7 +1,5 @@
-
 #include "mks_wifi_gcodes.h"
 #ifdef MKS_WIFI
-
 
 const uint8_t pak[5]={0xA5,0x07,0x00,0x00,0xFC};
 
@@ -103,6 +101,14 @@ void mks_m23(char *filename){
     uint8_t dot_pos;
 
     DEBUG("M23: %s",filename);
+
+    if(filename[0] == '/'){
+      DEBUG("Strip slash");
+      for(uint32_t i = 0; i < strlen(filename) ; i++){
+        filename[i] = filename[i+1];
+      }
+      DEBUG("Fixed name: %s",filename);
+    }
 
     //Имя файла может быть меньше 12 символов, но с расширением .gcode
     //С конца имени файла шагаем к началу, считаем сколько символов до точки

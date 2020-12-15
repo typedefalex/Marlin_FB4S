@@ -1,7 +1,6 @@
 #include "mks_wifi.h"
 #ifdef MKS_WIFI
 
-
 #include "../../lcd/ultralcd.h"
 #include "mks_wifi_sd.h"
 #include "mks_test_sdio.h"
@@ -135,6 +134,7 @@ uint8_t mks_wifi_input(uint8_t data){
 
 	//Не отдавать данные в очередь команд, если идет печать
 	if (CardReader::isPrinting()){
+		DEBUG("No input while printing");
 		return 1;
 	}	
 	
@@ -143,6 +143,8 @@ uint8_t mks_wifi_input(uint8_t data){
 		packet_start_flag=1;
 		packet_index=0;
 		memset((uint8_t*)mks_in_buffer,0,MKS_IN_BUFF_SIZE);
+	}else if(!packet_start_flag){
+		DEBUG("Byte not in packet %0X %c",data,data);
 	}
 
 	if(packet_start_flag){
@@ -326,42 +328,7 @@ void mks_wifi_parse_packet(ESP_PROTOC_FRAME *packet){
 
 }
 
-void mks_wifi_print_var(uint8_t count, ...){
-	va_list args;
-	uint8_t data;
 
-	va_start(args, count);
-
-    while (count--) {
-        data = va_arg(args, unsigned);
-		mks_wifi_out_add(&data, 1);
-    }
-    va_end(args);
-}
-
-
-void mks_wifi_print(const char *s){
-	mks_wifi_out_add((uint8_t *)s, strnlen((char *)s,ESP_PACKET_DATA_MAX_SIZE));
-}
-
-void mks_wifi_print(int i){
-	char str[100];
-
-	sprintf(str,"%d",i);
-	mks_wifi_out_add((uint8_t *)str, strnlen((char *)str,ESP_PACKET_DATA_MAX_SIZE));
-}
-
-
-void mks_wifi_println(const char *s){
-	mks_wifi_out_add((uint8_t *)s, strnlen((char *)s,ESP_PACKET_DATA_MAX_SIZE));
-}
-
-void mks_wifi_println(float f){
-	char str[100];
-
-	sprintf(str,"%ld\n",(uint32_t)f);
-	mks_wifi_out_add((uint8_t *)str, strnlen((char *)str,ESP_PACKET_DATA_MAX_SIZE));
-}
 
 uint16_t mks_wifi_build_packet(uint8_t *packet, ESP_PROTOC_FRAME *esp_frame){
 	uint16_t packet_size=0;

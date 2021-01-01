@@ -276,7 +276,7 @@ BlTouch
 /*
 Модуль MKS WIFI
 */
-#define MKS_WIFI
+//#define MKS_WIFI
 
 #ifdef MKS_WIFI
 
